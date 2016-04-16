@@ -5,7 +5,12 @@
         <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
         <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico"/>
-        <style>         
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+        <style>  
+            @font-face {
+                font-family="Champ&Lim"
+                src = url('http://dl.dafont.com/dl/?f=champagne_limousines.tff');
+            }
             html, body, #map {
                 height:100%;
                 padding:0;
@@ -29,10 +34,10 @@
                 margin-right: 10px;
             }
             #reset-button {
-                background: #CEECF5;
+                background: #F2F2F2;
                 position: absolute;
                 float:left;
-                right: 100px;
+                right: 80px;
                 top:50px;
                 padding: 5px;
                 -moz-border-radius: 5px;
@@ -42,6 +47,9 @@
                 margin-top: 10px;
                 margin-left: 10px;
                 margin-right: 10px;
+                font-family: 'Champ&Lim';
+                font-size: 14;
+                font-weight: bold;
             }
         </style>
         <script src='http://code.jquery.com/jquery-latest.min.js'></script>
@@ -63,10 +71,6 @@
                 map = vis.getNativeMap();
                 var basemap = layers[0];
                 var layer = layers[1];
-//                $('#enter').click(function({
-//                    
-//                    openInfoWindow
-//                }))
             }).on('error', function(err) {
                 console.log(err);
             });         
@@ -97,7 +101,6 @@
             $('#reset-button').click(function() {
                 map.setView([0, 0], 2);
             }); 
-            
         }
         window.onload = main;
     </script>
