@@ -21,7 +21,7 @@
                 top: 50px;
                 left: 75px;
                 padding: 5px;
-                border: 1px solid #c0c0c0;
+                border: 2px solid #c0c0c0;
                 float: left;
                 width: 275px;
                 -moz-border-radius: 5px;
@@ -34,7 +34,7 @@
                 margin-right: 10px;
             }
             #reset-button {
-                background: #F2F2F2;
+                background: #FFF;
                 position: absolute;
                 float:left;
                 right: 80px;
@@ -45,22 +45,28 @@
                 width: 200px;
                 margin-bottom: 10px;
                 margin-top: 10px;
-                margin-left: 5px;
+                margin-left: 10px;
                 margin-right: 10px;
                 font-family: 'Champ&Lim';
                 font-size: 14;
                 font-weight: bold;
             }
             .search-button {
-                background: #F2F2F2;
+                background: #FFF;
                 position: absolute;
-                font-size: 90%;
-                top: 50px;
-                left: 500px;
-                float: left;
+                float:left;
+                left: 360px;
+                top:50px;
+                padding: 5px;
+                border: 2px solid #c0c0c0;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                width: auto;
+                height: auto;
                 margin-bottom: 10px;
                 margin-top: 10px;
-                margin-left: 5px;
+                margin-left: 10px;
                 margin-right: 10px;
             }
         </style>
@@ -88,7 +94,7 @@
             });         
             // use a click event to regester the information from the search bar
             var sql = new cartodb.SQL({user: 'mccook3'});
-            $('#enter').click(function() {
+            $('.search-button').click(function() {
                 var input = $("#userInput").val();    
                     console.log(input);
                     query = "SELECT * FROM rcc_fellows_locations WHERE first_last ILIKE '%" + input + "%'";
@@ -102,7 +108,7 @@
             //allow enter key to initiate the userInput value
             $('#userInput').keypress(function(event){
                 if(event.keyCode == 13){
-                    $('#enter').click();
+                    $('.search-button').click();
                 }
             });
             //highlight text when user click the search bar
@@ -121,7 +127,7 @@
         <div id="search-container">
             <input type='Text' id='userInput' name='first_last'>
             <input type="Button" id="reset-button" value="Reset View">
-            <input type="Button" id="search-button"><i class="fa fa-search"></i></input>
+            <a href="#" class="search-button"><i class="fa fa-search"></i></a>
         </div>  
     </body>
 </html>
