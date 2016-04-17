@@ -32,6 +32,8 @@
                 margin-top: 10px;
                 margin-left: 10px;
                 margin-right: 10px;
+                font-family: 'Champ&Lim';
+                font-size: 14;
             }
             #reset-button {
                 background: #FFF;
@@ -69,6 +71,9 @@
                 margin-left: 10px;
                 margin-right: 10px;
             }
+            #search-container {
+                font-family: 'Champ&Lim';
+            }
         </style>
         <script src='http://code.jquery.com/jquery-latest.min.js'></script>
         <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
@@ -96,7 +101,7 @@
             $('.search-button').click(function() {
                 var input = $("#userInput").val();    
                     console.log(input);
-                    query = "SELECT * FROM rcc_fellows_locations WHERE first_last ILIKE '%" + input + "%'";
+                    query = "SELECT * FROM rcc_fellows_locations WHERE first_last ILIKE '%" + input + "%' OR(institution ILIKE '%" + input + "%') OR(geographic_area ILIKE '%" + input + "%') OR(geographic_area2 ILIKE '%" + input + "%') OR(subj ILIKE '%" + input + "%') OR(subj2 ILIKE '%" + input + "%') OR(subj3 ILIKE '%" + input + "%')";
                     console.log(query);
                     sql.getBounds(query).done(function(bounds) {
                         latlng = bounds[0]
@@ -104,6 +109,7 @@
                         map.fitBounds(bounds);
                 });
             });
+            //,t1.geographic_area, t2.first_last, t3.subj, t4.subj2, t5.subj3, t6.institution WHERE t1, t2, t3, t4, t5, t6
             //allow enter key to initiate the userInput value
             $('#userInput').keypress(function(event){
                 if(event.keyCode == 13){
