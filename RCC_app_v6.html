@@ -102,6 +102,9 @@
             }
             #panel {
                 font-family: "Champ&Lim";
+                width: auto;
+                height: 125px;
+                padding: 5px;
             }
             #radio {
                 position: absolute;
@@ -116,7 +119,15 @@
                 margin-left: 10px;
                 margin-right: 10px;
             }
-        
+            #reset-filter {
+                font-family: "Champ&Lim";
+                width: 150px;
+                height: auto;
+                margin-bottom: 10px;
+                margin-top: 12px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
         </style>
         <script src='http://code.jquery.com/jquery-latest.min.js'></script>
         <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
@@ -153,7 +164,18 @@
                         console.log(latlng);
                         map.fitBounds(bounds);
                 });
-            });        
+            });
+            function checkboxSQL() {
+                var checkbox_sql = new cartodb.SQL({user: 'mccook3'});
+                query = "SELECT * FROM rcc_fellows_locations WHERE male_female ILIKE '%male%'"
+                $('#male').click(function() {
+                    if($('#male').checked) {
+                        sql.execute(query);
+                } else {
+                    sql.execute("SELECT * FROM rcc_fellows_locations");
+                }
+            });
+            }
             //allow enter key to initiate the userInput value
             $('#userInput').keypress(function(event){
                 if(event.keyCode == 13){
@@ -195,17 +217,19 @@
         <div id="accordion">
             <h1>Filter Option</h1>
             <div id="panel">
-                <input type="checkbox" id="male"><label for="male">Male</label>
-                <p><input type="checkbox" id="female"><label for="female">Female</label></p>
-                <p></p>
-                <p></p>
+                <p>Filter by Gender:</p>
+                <p><label><input type="checkbox" id="male"/>Male</label></p>
+                <p><label><input type="checkbox" id="female"/>Female</label></p>
+                <p>Show RCC BNB Hosts</p>
                 <p><input type="checkbox" id="rcc_bnb"><label for="rcc_bnb">Willing Hosts</label></p>
                 <p><input type="button" id="reset-filter" value="Reset Filters"></p>
             </div>
         </div>
+<!--
         <div id="radio">
             <input type="radio" id="satellite"><label for="satellite">Satellite</label>
             <input type="radio" id="streets"><label for="streets">Streets</label>
         </div>
+-->
     </body>
 </html>
