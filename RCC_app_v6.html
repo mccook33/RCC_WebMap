@@ -119,7 +119,7 @@
                 margin-left: 10px;
                 margin-right: 10px;
             }
-            #resetFilter {
+            #reset_filter {
                 font-family: "Champ&Lim";
                 width: 150px;
                 height: auto;
@@ -171,7 +171,7 @@
             }); 
         
             var LayerActions = {
-                resetFilter: function(){
+                reset_filter: function(){
                     sublayers[0].set({
                         sql: "SELECT * FROM rcc_fellows",
                         cartocss: "#rcc_fellows_locations{marker-fill: #F84F40; marker-width: 8; marker-line-color: white; marker-line-width: 2; marker-clip: false; marker-allow-overlap: true;}"
@@ -254,6 +254,11 @@
                     $('#male').attr('disabled', false);
                 }
             });
+            $('#reset_filter').click(function() {
+                $('#reset_filter').removeClass('selected');
+                $(this).addClass('selected');
+                LayerActions[$(this).attr('id')]();
+            })
         }
         window.onload = main;
     </script>
@@ -272,7 +277,7 @@
                 <p><label><input type="checkbox" id="female"/>Female</label></p>
                 <p>Show RCC BNB Hosts:</p>
                 <p><input type="checkbox" id="rcc_bnb"><label for="rcc_bnb">Willing Hosts</label></p>
-                <p><input type="button" id="resetFilter" value="Reset Filters"></p>
+                <p><input type="button" id="reset_filter" value="Reset Filters"></p>
             </div>
         </div>
 <!--
