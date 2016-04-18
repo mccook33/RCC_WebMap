@@ -204,6 +204,27 @@
             $(function(){
                 $("#radio").buttonset();
             });
+//            function checkboxSQL(){
+//                var checkSQL = new cartodb.
+//            }
+            $('#male').change(function() {
+                if($(this).is(':checked')){
+                    $('#female').attr('disabled', true);
+                    $(this).attr('disabled', false);
+                }
+                else{
+                    $('#female').attr('disabled', false);
+                }
+            });
+            $('#female').change(function(){
+                if($(this).is(':checked')){
+                    $('#male').attr('disabled', true);
+                    $(this).attr('disabled', false);
+                }
+                else{
+                    $('#male').attr('disabled', false)
+                }
+            })
         }
         window.onload = main;
     </script>
@@ -220,7 +241,7 @@
                 <p>Filter by Gender:</p>
                 <p><label><input type="checkbox" id="male"/>Male</label></p>
                 <p><label><input type="checkbox" id="female"/>Female</label></p>
-                <p>Show RCC BNB Hosts</p>
+                <p>Show RCC BNB Hosts:</p>
                 <p><input type="checkbox" id="rcc_bnb"><label for="rcc_bnb">Willing Hosts</label></p>
                 <p><input type="button" id="reset-filter" value="Reset Filters"></p>
             </div>
