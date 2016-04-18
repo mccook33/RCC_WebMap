@@ -119,7 +119,7 @@
                 margin-left: 10px;
                 margin-right: 10px;
             }
-            #reset-filter {
+            #resetFilter {
                 font-family: "Champ&Lim";
                 width: 150px;
                 height: auto;
@@ -145,13 +145,54 @@
                 zoom: 2,
                 scrollwheel: true 
             }
+            var el = {
+                layer: null,
+            }
+            var sublayers = []
             cartodb.createVis('map', mapURL, options).on('done', function(vis, layers) {  
                 map = vis.getNativeMap();
-                var basemap = layers[0];
+                
                 var layer = layers[1];
+                
+                el.layer = layer;
+                
+                var subLayerOptions = {
+                    sql: "SELECT * FROM rcc_fellows_locations",
+                    cartocss: "#rcc_fellows_locations{marker-fill: #F84F40; marker-width: 8; marker-line-color: white; marker-line-width: 2; marker-clip: false; marker-allow-overlap: true;}"
+                }
+
+                var sublayer = layer.getSubLayer(0);
+
+                sublayer.set(subLayerOptions);
+
+                sublayers.push(sublayer);
             }).on('error', function(err) {
                 console.log(err);
-            });         
+            }); 
+        
+            var LayerActions = {
+                resetFilter: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #F84F40; marker-width: 8; marker-line-color: white; marker-line-width: 2; marker-clip: false; marker-allow-overlap: true;}"
+                    });
+                    return true;
+                },
+                male: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'male'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #F84F40; marker-width: 8; marker-line-color: white; marker-line-width: 2; marker-clip: false; marker-allow-overlap: true;}"
+                    });
+                    return true;
+                },
+                female: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'female'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #F84F40; marker-width: 8; marker-line-color: white; marker-line-width: 2; marker-clip: false; marker-allow-overlap: true;}"
+                    });
+                    return true;
+                },
+            }
             // use a click event to regester the information from the search bar
             var sql = new cartodb.SQL({user: 'mccook3'});
             $('.search-button').click(function() {
@@ -165,17 +206,7 @@
                         map.fitBounds(bounds);
                 });
             });
-            function checkboxSQL() {
-                var checkbox_sql = new cartodb.SQL({user: 'mccook3'});
-                query = "SELECT * FROM rcc_fellows_locations WHERE male_female ILIKE '%male%'"
-                $('#male').click(function() {
-                    if($('#male').checked) {
-                        sql.execute(query);
-                } else {
-                    sql.execute("SELECT * FROM rcc_fellows_locations");
-                }
-            });
-            }
+            
             //allow enter key to initiate the userInput value
             $('#userInput').keypress(function(event){
                 if(event.keyCode == 13){
@@ -196,35 +227,33 @@
             $('#reset-button').click(function() {
                 map.setView([0, 0], 2);
             }); 
+            //accordian widget for filters
             $("#accordion").accordion({
                 collapsible: true,
                 active: false,
                 event: "mouseover"
             });
-            $(function(){
-                $("#radio").buttonset();
-            });
-//            function checkboxSQL(){
-//                var checkSQL = new cartodb.
-//            }
+            //checkbox function that allows allows one gender checkbox to be selected at a time and applies sql
             $('#male').change(function() {
                 if($(this).is(':checked')){
                     $('#female').attr('disabled', true);
                     $(this).attr('disabled', false);
+                    LayerActions[$(this).attr('id')]();
                 }
-                else{
+                else {
                     $('#female').attr('disabled', false);
                 }
             });
-            $('#female').change(function(){
-                if($(this).is(':checked')){
+            $('#female').change(function() {
+                if($(this).is(':checked')) {
                     $('#male').attr('disabled', true);
                     $(this).attr('disabled', false);
+                    LayerActions[$(this).attr('id')]();
                 }
-                else{
-                    $('#male').attr('disabled', false)
+                else {
+                    $('#male').attr('disabled', false);
                 }
-            })
+            });
         }
         window.onload = main;
     </script>
@@ -236,14 +265,14 @@
             <a href="#" class="search-button"><i class="fa fa-search"></i></a>
         </div>  
         <div id="accordion">
-            <h1>Filter Option</h1>
+            <h1>Filter Options</h1>
             <div id="panel">
                 <p>Filter by Gender:</p>
                 <p><label><input type="checkbox" id="male"/>Male</label></p>
                 <p><label><input type="checkbox" id="female"/>Female</label></p>
                 <p>Show RCC BNB Hosts:</p>
                 <p><input type="checkbox" id="rcc_bnb"><label for="rcc_bnb">Willing Hosts</label></p>
-                <p><input type="button" id="reset-filter" value="Reset Filters"></p>
+                <p><input type="button" id="resetFilter" value="Reset Filters"></p>
             </div>
         </div>
 <!--
