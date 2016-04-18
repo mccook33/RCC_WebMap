@@ -44,7 +44,7 @@
                 padding: 5px;
                 -moz-border-radius: 5px;
                 -webkit-border-radius: 5px;
-                width: 200px;
+                width: auto;
                 margin-bottom: 10px;
                 margin-top: 10px;
                 margin-left: 10px;
@@ -79,6 +79,26 @@
                 width:auto;
                 padding:1px;
             }
+            #accordion {
+                font-family: 'Champ&Lim';
+                font-size: 14;
+                color: black;
+                text-align: left;
+                position: absolute;
+                width: auto;
+                height: auto;
+                bottom: 50px;
+                left: 10px;
+                float: left;
+                margin-bottom: 10px;
+                margin-top: 10px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            #accordion.active, .accordion:hover {
+                background-color: #ddd
+            }
+        
         </style>
         <script src='http://code.jquery.com/jquery-latest.min.js'></script>
         <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
@@ -136,6 +156,11 @@
             $('#reset-button').click(function() {
                 map.setView([0, 0], 2);
             }); 
+            $("#accordion").accordion({
+                collapsible: true,
+                active: false,
+                event: "mouseover"
+            });
         }
         window.onload = main;
     </script>
@@ -146,6 +171,17 @@
             <input type="Button" id="reset-button" value="Reset View">
             <a href="#" class="search-button"><i class="fa fa-search"></i></a>
         </div>  
-        
+        <div id="accordion">
+            <h1>Filter Option</h1>
+            <div id="panel">
+                <p>Male</p>
+                <p>female</p>
+            </div>
+        </div>
+        <div id="radio">
+            <input type="radio" id="satellite" name="basemap"><label for="satellite">Satellite</label>
+            <input type="radio" id="greyscale" name="basemap"><label for="greyscale">Greyscale</label>
+            <input type="radio" id="satellite" name="basemap"><label for="satellite">Satellite</label>
+        </div>
     </body>
 </html>
