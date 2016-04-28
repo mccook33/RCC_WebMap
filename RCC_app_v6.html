@@ -11,11 +11,38 @@
                 font-family="Champ&Lim"
                 src = url('http://dl.dafont.com/dl/?f=champagne_limousines.tff');
             }
+            h4 {
+                font-family: "Champ&Lim";
+                text-align: left;
+                color: black;
+                font-size: 14;
+                margin: 5px; padding: 5px;
+            }
+            h1 {
+                font-family: "Champ&Lim";
+                color: black;
+                font-size: 16;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                border-style: double;
+                border-width: 3px;
+                border-left-width: 5px;
+                border-right-width: 5px;
+                z-index: 999;
+            }
             html, body, #map {
                 height:100%;
                 padding:0;
                 margin:0;                   
             } 
+            #rcc_image {
+                position: absolute;
+                bottom: 25px;
+                right: 10px;
+                border: 5px solid black;
+                z-index: 999;
+                opacity: 0.5;
+            }
             #userInput {
                 position: absolute;
                 top: 53px;
@@ -51,10 +78,79 @@
                 margin-right: 10px;
                 font-family: 'Champ&Lim';
                 font-size: 14;
-                color: #AFAEB0;
+                color: #818080;
             }
             #reset-button.active, #reset-button:hover {
                 background-color: #ddd
+            }
+            #accordion {
+                font-family: 'Champ&Lim';
+                font-size: 14;
+                text-align: right;
+                padding: 3; margin: 3;
+                color: #AFAEB0;
+                position: absolute;
+                width: auto;
+                height: auto;
+                bottom: 50px;
+                left: 10px;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+            #accordion.active, .accordion:hover {
+                background-color: aquamarine;
+                font-family: "Champ&Lim";
+            }
+            #panel {
+                background-color: #DBD9D9;
+                padding: 0; margin: 0;
+                width: auto;
+                height: auto;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+            #basemap_panel {
+                color: #000000;
+                font-family: "Champ&Lim";
+                align-content: center;
+                width: auto;
+                height: 20px;
+            }
+            .layer_selector {
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 5px;
+                padding: 0;
+/*                border: 1px solid #999;*/
+                width: auto;
+            }
+            .layer_selector > p {
+                padding: 5px 10px;
+                border-bottom: 1px solid #999;
+            }
+            .layer_selector ul {
+                padding: 1; margin: 1;
+                height: 260;
+                list-style-type: none;
+            }
+            .layer_selector li {
+                font-family: 'Champ&Lim';
+                padding: 5px 10px; margin: 5px;
+                cursor: pointer;
+                display: block;
+            }
+            .layer_selector li(:last-child) {
+                border-top: 5px solid #999;
+            }
+            .layer_selector li:hover:not(:last-child) {
+                background-color: #A0BEFC;
+                color: black;
+                opacity: 1;
+                -moz-border-radius: 5px;
+                cursor:pointer;
+                margin: 5px; padding: 5px;
+            }
+            .layer_selector.sql_selected {
+                background-color: #A6CEE3;
             }
             .search-button {
                 background: #FFF;
@@ -82,45 +178,6 @@
                 width:auto;
                 padding:1px;
             }
-            #accordion {
-                font-family: 'Champ&Lim';
-                font-size: 14;
-                text-align: left;
-                color: #AFAEB0;
-                position: absolute;
-                width: auto;
-                height: auto;
-                bottom: 50px;
-                left: 10px;
-                float: left;
-                margin-bottom: 10px;
-                margin-top: 10px;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-            #accordion.active, .accordion:hover {
-                margin-bottom: 10px;
-                margin-top: 10px;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-            #panel {
-                color: #000000;
-                font-family: "Champ&Lim";
-                width: auto;
-                height: 125px;
-                padding: 5px;
-            }
-            #reset_filter {
-                font-family: "Champ&Lim";
-                width: auto;
-                height: auto;
-                align-self: center;
-                margin-bottom: 10px;
-                margin-top: 10px;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
         </style>
 <!--        include JavaScript and Style libraries-->
         <script src='http://code.jquery.com/jquery-latest.min.js'></script>
@@ -134,54 +191,41 @@
             //map url that points to vis Json link for CartoDB
             mapURL = 'https://mccook3.cartodb.com/api/v2/viz/3136e62c-98bf-11e5-8d04-0ef24382571b/viz.json'
             
+            var tablename = "rcc_fellows_locations";
+            
+            function layerSelector(layer) {
+                var condition = "";
+                var $options = $(".layer_selector").find("li");
+                $options.click(function(e) {
+                    var $li = $(e.target);
+                    var selected = $li.attr('data');
+                    var type = $li.data('type');
+                    $options.removeClass('sql_selected');
+                    if (selected !== "") {
+                        $li.addClass('sql_selected');
+                    }
+                    layer.setSQL("SELECT * FROM " + tablename + selected)  
+                    })
+                }  
             var options = {   //map options
                 center: [10,0],
                 zoom: 2,
                 scrollwheel: true 
             }
+            
             var sublayer;   //create an empty variable to be populated by the sublayer
             
             cartodb.createVis('map', mapURL, options).on('done', function(vis, layer) {   //initiate cartodb map
-                
                 map = vis.getNativeMap();
                 var layer = layer[1]
                 sublayer = layer.getSubLayer(0);
+                layerSelector(sublayer);
                                 
             }).on('error', function(err) {
                 console.log(err);
             }); 
-            //create sublayers with SQL injections to be used with the filter checkboxes.
-            var LayerActions = {
-                bnb: function(){   //layer options for RCC BnB hosts
-                    sublayer.set({
-                        sql: "SELECT * FROM rcc_fellows_locations WHERE rcc_bnb ILIKE '%yes%'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #3284E7; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
-                    });
-                    return true;
-                },
-                male: function(){   //layer options for male sql/cartocss
-                    sublayer.set({
-                        sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'male'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
-                    });
-                    return true;
-                },
-                female: function(){   //layer options for female sql/cartocss
-                    sublayer.set({
-                        sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'female'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #7947AB; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
-                    });
-                    return true;
-                },
-                reset: function() {
-                    sublayer.set({
-                        sql: sublayer.getSQL(),
-                        cartocss: sublayer.getCartoCSS()
-                    })
-                }
-            }
-            //use a click event to regester the information from the search bar
             var sql = new cartodb.SQL({user: 'mccook3'});
+            //search bar click event
             $('.search-button').click(function() {
                 var input = $("#userInput").val();   //input from the search box 
                     console.log(input);
@@ -192,14 +236,17 @@
                         map.fitBounds(bounds);   //set map bounds to the result of the query; could add tooltip or infowindow pop-up upon zoom here
                 });
             });
+            //assign enter key to click function
             $('#userInput').keypress(function(event){
                 if(event.keyCode == 13){
                     $('.search-button').click();   //allow enter key action to initiate the userInput value
                 }
             });
+            //highlight text in search bar
             $('#userInput').click(function(){
                 $(this).select();   //highlight text when search bar is selected
             });
+            //tooltip for search bar
             $(function(){
                 $('#userInput').tooltip({   //add tooltip to search box to prompt the search categories
                     track:true,
@@ -212,42 +259,12 @@
             //accordian widget for filters
             $("#accordion").accordion({   //set accordion functions to collapsible when a mouse hover event
                 collapsible: true,
+                autowidth: true,
+                autoheight: true,
                 active: false,
-                event: "mouseover"
+                event: "mouseover",
             });
             //checkbox function that allows allows one gender checkbox to be selected at a time and applies sql; can't figure out how to reset SQL in the else{} statement!
-            $('#male').change(function() {   
-                if($(this).is(':checked')){   //show male fellows when checkbox is checked
-                    $('#female').attr('disabled', true);
-                    $(this).attr('disabled', false);
-                    LayerActions[$(this).attr('id')]();
-                    console.log($(this));
-                }
-                else {
-                    $('#female').attr('disabled', false);   //female checkbox cannot be checked if male is checked
-                }
-            });
-            $('#female').change(function() {            
-                if($(this).is(':checked')) {   //show female fellows when checkbox is clicked 
-                    $('#male').attr('disabled', true);
-                    $(this).attr('disabled', false);
-                    LayerActions[$(this).attr('id')]();
-                    console.log($(this));
-                }
-                else {
-                    $('#male').attr('disabled', false);   //male checkbox cannot be checked if female box is checked
-                }   
-            });
-            $('#bnb').change(function() {   //show willing hosts, need to be able to query this within male or female
-                if($(this).is(':checked')) {
-                    LayerActions[$(this).attr('id')]();
-                    console.log($(this));
-                }
-                });
-            $('#reset').click(function() {  //reset button to set sql back to original
-                sublayer.setSQL();
-                console.log($(this))
-            })
         }
         window.onload = main;
     </script>
@@ -259,26 +276,21 @@
             <a href="#" class="search-button"><i class="fa fa-search"></i></a>
         </div>  
         <div id="accordion">
-            <h1>Filter Options</h1>
-            <div id="panel">
-                <h4>Filter by Gender:</h4>
-                <p></p>
-                <h5><label><input type="checkbox" id="male"/>Male</label></h5>
-                <p></p>
-                <h5><label><input type="checkbox" id="female"/>Female</label></h5>
-                <p></p>
-                <h4>RCC BNB:</h4>
-                <p></p>
-                <h5><input type="checkbox" id="bnb"><label for="rcc_bnb">Willing Hosts</label></h5>
-                <p></p>
-                <h4><input type="Button" id="reset" value="Reset Filters"</h4>
+            <h4>Filter Options</h4>
+            <div id="panel" class='layer_selector'>
+              <ul>
+                <h4>By Gender:</h4>
+                <li data=" WHERE male_female = 'female'" data-type="sql"><center>Female</center></li>
+                <li data=" WHERE male_female = 'male'" data-type="sql"><center>Male</center></li>
+                <h4>RCC Bed n' Breakfast:</h4>
+                <li data=" WHERE rcc_bnb ILIKE '%yes%'" data-type="sql"><center>Willing Hosts</center></li>
+                <li data="" data-type="sql"><p><center><h1>Reset Filters</h1></center></p></li>
+              </ul>
             </div>
         </div>
-<!--need to add sublayers for these different basemaps if we want this
-        <div id="radio">
-            <input type="radio" id="satellite"><label for="satellite">Satellite</label>
-            <input type="radio" id="streets"><label for="streets">Streets</label>
+        <div id="rcc_image">
+                <img src="https://tnp-production.s3.amazonaws.com/uploads/image_logo/000/018/754/image/medium_62b1203c7f.png">
         </div>
--->
     </body>
+    
 </html>
