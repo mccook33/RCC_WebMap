@@ -149,21 +149,16 @@
             cartodb.createVis('map', mapURL, options).on('done', function(vis, layer) {  
                 
                 map = vis.getNativeMap();
+                
                 var layer = layer[1]
 
                 sublayer = layer.getSubLayer(0);
-                
+                                
             }).on('error', function(err) {
                 console.log(err);
             }); 
             //create sublayers with SQL injections to be used with the filter checkboxes.
             var LayerActions = {
-                bnb: function(){
-                    sublayer.set({
-                        sql: sublayer.getSQL(),
-                        cartocss: sublayer.getCartoCSS()
-                    });
-                },
                 bnb: function(){
                     sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE rcc_bnb ILIKE '%yes%'",
@@ -255,6 +250,10 @@
                     console.log($(this));
                 }
                 });
+            var reset_sql = sublayer.getSQL();
+            $('#reset').click(function(sublayer) {
+                sublayer.setSQL(reset_sql);
+            })
             //reset filter option button. So far, I can't get the layer to show when clicked. Maybe this button can just refresh the page to bring the original map back?
             
         }
@@ -271,11 +270,16 @@
             <h1>Filter Options</h1>
             <div id="panel">
                 <h4>Filter by Gender:</h4>
+                <p></p>
                 <h5><label><input type="checkbox" id="male"/>Male</label></h5>
+                <p></p>
                 <h5><label><input type="checkbox" id="female"/>Female</label></h5>
+                <p></p>
                 <h4>RCC BNB:</h4>
+                <p></p>
                 <h5><input type="checkbox" id="bnb"><label for="rcc_bnb">Willing Hosts</label></h5>
-                <h4><input type="Button" id="reset_filter" value="Reset Filters"</h4>
+                <p></p>
+                <h4><input type="Button" id="reset" value="Reset Filters"</h4>
             </div>
         </div>
 <!--need to add sublayers for these different basemaps if we want this
