@@ -18,7 +18,7 @@
             } 
             #userInput {
                 position: absolute;
-                top: 50px;
+                top: 53px;
                 left: 75px;
                 padding: 5px;
                 border: 2px solid #c0c0c0;
@@ -40,7 +40,7 @@
                 position: absolute;
                 float:left;
                 right: 80px;
-                top:50px;
+                top:53px;
                 padding: 5px;
                 -moz-border-radius: 5px;
                 -webkit-border-radius: 5px;
@@ -51,6 +51,7 @@
                 margin-right: 10px;
                 font-family: 'Champ&Lim';
                 font-size: 14;
+                color: #AFAEB0;
             }
             #reset-button.active, #reset-button:hover {
                 background-color: #ddd
@@ -84,8 +85,8 @@
             #accordion {
                 font-family: 'Champ&Lim';
                 font-size: 14;
-                color: black;
                 text-align: left;
+                color: #AFAEB0;
                 position: absolute;
                 width: auto;
                 height: auto;
@@ -98,35 +99,26 @@
                 margin-right: 10px;
             }
             #accordion.active, .accordion:hover {
-                background-color: #ddd
-            }
-            #panel {
-                font-family: "Champ&Lim";
-                width: auto;
-                height: 125px;
-                padding: 5px;
-            }
-/*
-            #radio {
-                position: absolute;
-                font-family: "Champ&Lim";
-                font-size: 14;
-                align-content: center;
-                align-items: center;
-                top:50px;
-                right:300px;
                 margin-bottom: 10px;
                 margin-top: 10px;
                 margin-left: 10px;
                 margin-right: 10px;
             }
-*/
+            #panel {
+                background: linear-gradient(#333 0%, #444 100%);
+                color: #ddd;
+                font-family: "Champ&Lim";
+                width: auto;
+                height: 125px;
+                padding: 5px;
+            }
             #reset_filter {
                 font-family: "Champ&Lim";
-                width: 20px;
+                width: auto;
                 height: auto;
+                align-self: center;
                 margin-bottom: 10px;
-                margin-top: 12px;
+                margin-top: 10px;
                 margin-left: 10px;
                 margin-right: 10px;
             }
@@ -161,30 +153,30 @@
                 var layer = layer[1]
 
                 sublayer = layer.getSubLayer(0);
-
-//                sublayers.push(sublayer);
                 
             }).on('error', function(err) {
                 console.log(err);
             }); 
             //create sublayers with SQL injections to be used with the filter checkboxes.
             var LayerActions = {
-                reset_filter: function(){
-                    sublayer.getSQL;
-                    sublayer.getCartoCSS;
+                bnb: function(){
+                    sublayer.set({
+                        sql: "SELECT * FROM rcc_fellows_locations WHERE rcc_bnb ILIKE '%yes%'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                    });
                     return true;
                 },
                 male: function(){
                     sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'male'",
-                        cartocss: "#rcc_fellows_locations{marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-opacity: 1; marker-placement: point; marker-type: ellipse; marker-fill: #B40903; marker-allow-overlap: true; [zoom = 1] {marker-width: 6} [zoom = 2] {marker-width: 7} [zoom = 3] {marker-width: 10} [zoom = 4] {marker-width: 12} [zoom > 6] {marker-width: 14} [zoom > 7] {marker-width: 16}"
+                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
                     });
                     return true;
                 },
                 female: function(){
                     sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'female'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #F84F40; marker-width: 8; marker-line-color: white; marker-line-width: 2; marker-clip: false; marker-allow-overlap: true;}"
+                        cartocss: "#rcc_fellows_locations{marker-fill: #7947AB; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
                     });
                     return true;
                 },
@@ -239,6 +231,9 @@
                 }
                 else {
                     $('#female').attr('disabled', false);
+                    if($(this).is(':unchecked')){
+                        
+                    }
                 }
             });
             $('#female').change(function() {
@@ -252,6 +247,12 @@
                     $('#male').attr('disabled', false);
                 }   
             });
+            $('#bnb').change(function() {
+                if($(this).is(':checked')) {
+                    LayerActions[$(this).attr('id')]();
+                    console.log($(this));
+                }
+                });
             //reset filter option button. So far, I can't get the layer to show when clicked. Maybe this button can just refresh the page to bring the original map back?
         }
         window.onload = main;
@@ -270,8 +271,8 @@
                 <p><label><input type="checkbox" id="male"/>Male</label></p>
                 <p><label><input type="checkbox" id="female"/>Female</label></p>
                 <p>Show RCC BNB Hosts:</p>
-                <p><input type="checkbox" id="rcc_bnb"><label for="rcc_bnb">Willing Hosts</label></p>
-                <p><label><input type="checkbox" id="reset_filter"/>Reset Filters</label></p>
+                <p><input type="checkbox" id="bnb"><label for="rcc_bnb">Willing Hosts</label></p>
+                <p><input type="Button" id="reset_filter" value="Reset Filters"</p>
             </div>
         </div>
 <!--
