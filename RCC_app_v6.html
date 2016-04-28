@@ -122,36 +122,29 @@
                 margin-right: 10px;
             }
         </style>
-<!--        include libraries-->
+<!--        include JavaScript and Style libraries-->
         <script src='http://code.jquery.com/jquery-latest.min.js'></script>
         <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
         <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
         <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15.9/cartodb.js"></script>
-        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css"/>
     </head>
     <script>
         function main() {
             //map url that points to vis Json link for CartoDB
             mapURL = 'https://mccook3.cartodb.com/api/v2/viz/3136e62c-98bf-11e5-8d04-0ef24382571b/viz.json'
-            //creatVis used here because it allows me to bring a Mapbox studio classic map
-            var options = {
+            
+            var options = {   //map options
                 center: [10,0],
                 zoom: 2,
                 scrollwheel: true 
             }
-            //create an element that references the layer; so far this has not worked for me
-            var el = {
-                layer: null,
-            }
-            //create an empty variable to be populated by the sublayer
-            var sublayer;
+            var sublayer;   //create an empty variable to be populated by the sublayer
             
-            cartodb.createVis('map', mapURL, options).on('done', function(vis, layer) {  
+            cartodb.createVis('map', mapURL, options).on('done', function(vis, layer) {   //initiate cartodb map
                 
                 map = vis.getNativeMap();
-                
                 var layer = layer[1]
-
                 sublayer = layer.getSubLayer(0);
                                 
             }).on('error', function(err) {
@@ -159,103 +152,102 @@
             }); 
             //create sublayers with SQL injections to be used with the filter checkboxes.
             var LayerActions = {
-                bnb: function(){
+                bnb: function(){   //layer options for RCC BnB hosts
                     sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE rcc_bnb ILIKE '%yes%'",
                         cartocss: "#rcc_fellows_locations{marker-fill: #3284E7; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
                     });
                     return true;
                 },
-                male: function(){
+                male: function(){   //layer options for male sql/cartocss
                     sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'male'",
                         cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
                     });
                     return true;
                 },
-                female: function(){
+                female: function(){   //layer options for female sql/cartocss
                     sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'female'",
                         cartocss: "#rcc_fellows_locations{marker-fill: #7947AB; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
                     });
                     return true;
                 },
+                reset: function() {
+                    sublayer.set({
+                        sql: sublayer.getSQL(),
+                        cartocss: sublayer.getCartoCSS()
+                    })
+                }
             }
             //use a click event to regester the information from the search bar
             var sql = new cartodb.SQL({user: 'mccook3'});
             $('.search-button').click(function() {
-                var input = $("#userInput").val();    
+                var input = $("#userInput").val();   //input from the search box 
                     console.log(input);
                     query = "SELECT * FROM rcc_fellows_locations WHERE first_last ILIKE '%" + input + "%' OR(institution ILIKE '%" + input + "%') OR(geographic_area ILIKE '%" + input + "%') OR(geographic_area2 ILIKE '%" + input + "%') OR(subj ILIKE '%" + input + "%') OR(subj2 ILIKE '%" + input + "%') OR(subj3 ILIKE '%" + input + "%')";
-//                    console.log(query);
                     sql.getBounds(query).done(function(bounds) {
-                        latlng = bounds[0]
+                        latlng = bounds[0]   //retrieve lat/long of the result of the sql
                         console.log(latlng);
-                        map.fitBounds(bounds);
+                        map.fitBounds(bounds);   //set map bounds to the result of the query; could add tooltip or infowindow pop-up upon zoom here
                 });
             });
-            
-            //allow enter key to initiate the userInput value
             $('#userInput').keypress(function(event){
                 if(event.keyCode == 13){
-                    $('.search-button').click();
+                    $('.search-button').click();   //allow enter key action to initiate the userInput value
                 }
             });
-            //highlight text when user click the search bar
             $('#userInput').click(function(){
-                $(this).select();
+                $(this).select();   //highlight text when search bar is selected
             });
-            //add tooltip to search box to prompt the search categories
             $(function(){
-                $('#userInput').tooltip({
+                $('#userInput').tooltip({   //add tooltip to search box to prompt the search categories
                     track:true,
                 });
             });
             //reset view button event
-            $('#reset-button').click(function() {
-                map.setView([10, 0], 2);
+            $('#reset-button').click(function() {   
+                map.setView([10, 0], 2);   //reset map view to original
             }); 
             //accordian widget for filters
-            $("#accordion").accordion({
+            $("#accordion").accordion({   //set accordion functions to collapsible when a mouse hover event
                 collapsible: true,
                 active: false,
                 event: "mouseover"
             });
             //checkbox function that allows allows one gender checkbox to be selected at a time and applies sql; can't figure out how to reset SQL in the else{} statement!
-            $('#male').change(function() {
-                if($(this).is(':checked')){
+            $('#male').change(function() {   
+                if($(this).is(':checked')){   //show male fellows when checkbox is checked
                     $('#female').attr('disabled', true);
                     $(this).attr('disabled', false);
                     LayerActions[$(this).attr('id')]();
                     console.log($(this));
                 }
                 else {
-                    $('#female').attr('disabled', false);
+                    $('#female').attr('disabled', false);   //female checkbox cannot be checked if male is checked
                 }
             });
-            $('#female').change(function() {
-                if($(this).is(':checked')) {
+            $('#female').change(function() {            
+                if($(this).is(':checked')) {   //show female fellows when checkbox is clicked 
                     $('#male').attr('disabled', true);
                     $(this).attr('disabled', false);
                     LayerActions[$(this).attr('id')]();
                     console.log($(this));
                 }
                 else {
-                    $('#male').attr('disabled', false);
+                    $('#male').attr('disabled', false);   //male checkbox cannot be checked if female box is checked
                 }   
             });
-            $('#bnb').change(function() {
+            $('#bnb').change(function() {   //show willing hosts, need to be able to query this within male or female
                 if($(this).is(':checked')) {
                     LayerActions[$(this).attr('id')]();
                     console.log($(this));
                 }
                 });
-            var reset_sql = sublayer.getSQL();
-            $('#reset').click(function(sublayer) {
-                sublayer.setSQL(reset_sql);
+            $('#reset').click(function() {  //reset button to set sql back to original
+                sublayer.setSQL();
+                console.log($(this))
             })
-            //reset filter option button. So far, I can't get the layer to show when clicked. Maybe this button can just refresh the page to bring the original map back?
-            
         }
         window.onload = main;
     </script>
