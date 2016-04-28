@@ -61,7 +61,7 @@
                 position: absolute;
                 float:left;
                 left: 360px;
-                top:50px;
+                top:53px;
                 padding: 5px;
                 border: 2px solid #c0c0c0;
                 -moz-border-radius: 5px;
@@ -105,8 +105,7 @@
                 margin-right: 10px;
             }
             #panel {
-                background: linear-gradient(#333 0%, #444 100%);
-                color: #ddd;
+                color: #000000;
                 font-family: "Champ&Lim";
                 width: auto;
                 height: 125px;
@@ -161,8 +160,14 @@
             var LayerActions = {
                 bnb: function(){
                     sublayer.set({
+                        sql: sublayer.getSQL(),
+                        cartocss: sublayer.getCartoCSS()
+                    });
+                },
+                bnb: function(){
+                    sublayer.set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE rcc_bnb ILIKE '%yes%'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                        cartocss: "#rcc_fellows_locations{marker-fill: #3284E7; marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
                     });
                     return true;
                 },
@@ -213,7 +218,7 @@
             });
             //reset view button event
             $('#reset-button').click(function() {
-                map.setView([0, 0], 2);
+                map.setView([10, 0], 2);
             }); 
             //accordian widget for filters
             $("#accordion").accordion({
@@ -231,9 +236,6 @@
                 }
                 else {
                     $('#female').attr('disabled', false);
-                    if($(this).is(':unchecked')){
-                        
-                    }
                 }
             });
             $('#female').change(function() {
@@ -254,6 +256,7 @@
                 }
                 });
             //reset filter option button. So far, I can't get the layer to show when clicked. Maybe this button can just refresh the page to bring the original map back?
+            
         }
         window.onload = main;
     </script>
@@ -267,15 +270,15 @@
         <div id="accordion">
             <h1>Filter Options</h1>
             <div id="panel">
-                <p>Filter by Gender:</p>
-                <p><label><input type="checkbox" id="male"/>Male</label></p>
-                <p><label><input type="checkbox" id="female"/>Female</label></p>
-                <p>Show RCC BNB Hosts:</p>
-                <p><input type="checkbox" id="bnb"><label for="rcc_bnb">Willing Hosts</label></p>
-                <p><input type="Button" id="reset_filter" value="Reset Filters"</p>
+                <h4>Filter by Gender:</h4>
+                <h5><label><input type="checkbox" id="male"/>Male</label></h5>
+                <h5><label><input type="checkbox" id="female"/>Female</label></h5>
+                <h4>RCC BNB:</h4>
+                <h5><input type="checkbox" id="bnb"><label for="rcc_bnb">Willing Hosts</label></h5>
+                <h4><input type="Button" id="reset_filter" value="Reset Filters"</h4>
             </div>
         </div>
-<!--
+<!--need to add sublayers for these different basemaps if we want this
         <div id="radio">
             <input type="radio" id="satellite"><label for="satellite">Satellite</label>
             <input type="radio" id="streets"><label for="streets">Streets</label>
