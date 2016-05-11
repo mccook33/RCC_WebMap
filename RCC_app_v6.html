@@ -35,7 +35,7 @@
                 padding:0;
                 margin:0;                   
             } 
-            #rcc_image {
+            .rcc_image {
                 position: absolute;
                 bottom: 25px;
                 right: 10px;
@@ -43,7 +43,7 @@
                 z-index: 999;
                 opacity: 0.5;
             }
-            #userInput {
+            .userInput {
                 position: absolute;
                 top: 53px;
                 left: 75px;
@@ -62,68 +62,6 @@
                 font-family: 'Champ&Lim';
                 font-size: 14;
             }
-            #reset-button {
-                background: #FFF;
-                position: absolute;
-                float:left;
-                right: 80px;
-                top:53px;
-                padding: 5px;
-                -moz-border-radius: 5px;
-                -webkit-border-radius: 5px;
-                width: auto;
-                margin-bottom: 10px;
-                margin-top: 10px;
-                margin-left: 10px;
-                margin-right: 10px;
-                font-family: 'Champ&Lim';
-                font-size: 14;
-                color: #818080;
-            }
-            #reset-button.active, #reset-button:hover {
-                background-color: #ddd
-            }          
-            #panel {
-                position: absolute;
-                bottom: 50;
-                left: 25;
-                background-color: transparent #DBD9D9;
-                opacity: 0.8;
-                padding: 0; margin: 0;
-                width: auto;
-                height: auto;
-                -moz-border-radius: 5px;
-                -webkit-border-radius: 5px;
-            }
-            .layer_selector {
-                background: rgba(255, 255, 255, 0.9);
-                border-radius: 5px;
-                padding: 0;
-/*                border: 1px solid #999;*/
-                width: auto;
-                height: auto;
-            }
-            .layer_selector > p {
-                padding: 5px 10px;
-                border-bottom: 1px solid #999;
-            }
-            .layer_selector ul {
-                padding: 0; margin: 0;
-                height: auto;
-                list-style-type: none;
-            }
-            .layer_selector li {
-                font-family: 'Champ&Lim';
-                padding: 0px 0px; margin: 5px;
-                cursor: pointer;
-                display: block;
-            }
-            .layer_selector li(:last-child) {
-                border-top: 5px solid #999;
-            }
-            .layer_selector.sql_selected {
-                background-color: #A6CEE3;
-            }
             .search-button {
                 background: #FFF;
                 position: absolute;
@@ -141,6 +79,57 @@
                 margin-top: 10px;
                 margin-left: 10px;
                 margin-right: 10px;
+            }
+            .reset-button {
+                background: #FFF;
+                position: absolute;
+                float:left;
+                left: 400px;
+                top:53px;
+                padding: 5px;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                width: auto;
+                margin-bottom: 10px;
+                margin-top: 10px;
+                margin-left: 10px;
+                margin-right: 10px;
+                font-family: 'Champ&Lim';
+                font-size: 14;
+                color: #451FA9;
+            }
+            .reset-button.active, .reset-button:hover {
+                background-color: #ddd
+            }          
+            #panel {
+                position: absolute;
+                bottom: 50;
+                left: 25;
+                background-color: transparent #DBD9D9;
+                opacity: 0.8;
+                padding: 5; margin: 5;
+                width: auto;
+                height: auto;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+            .layer_selector {
+                background: rgba(255, 255, 255, 0.8);
+                font-family: 'Champ&Lim';
+                border-radius: 5px;
+                padding: 5;
+                width: auto;
+                height: auto;
+            }
+            .reset_filters {
+                background-color: #FFF;
+                font-family: 'Champ&Lim';
+                font-size: 14px;
+                border-radius: 5px;
+                padding: 10px; margin: 20px;
+            }
+            .reset_filters.active, .reset_filters:hover {
+                background-color: #ddd;
             }
             .ui-tooltip-content {
                 font-family: 'Champ&Lim';
@@ -164,19 +153,9 @@
             mapURL = 'https://mccook3.cartodb.com/api/v2/viz/3136e62c-98bf-11e5-8d04-0ef24382571b/viz.json'
             
             var tablename = "rcc_fellows_locations";
-            
-//            function layerSelector(layer){
-//                $(".layer").change(function(){
-//                    layer.getSubLayers().forEach(function(sublayer){sublayer.remove()});
-//                    $.each($(".layer:checked"), function(e){
-//                        var $li = $(e.target);
-//                        var selected = $li.attr('data');
-//                        layer.setSQL("SELECT * FROM " + tablename + selected)
-//                    })
-//                })
-//            }
+    
             var options = {   //map options
-                center: [10,0],
+                center: [10,-5],
                 zoom: 2,
                 scrollwheel: true 
             }
@@ -195,44 +174,35 @@
             var sql = new cartodb.SQL({user: 'mccook3'});
             //search bar click event
             $('.search-button').click(function() {
-                var input = $("#userInput").val();   //input from the search box 
+                var input = $(".userInput").val();   //input from the search box 
                     console.log(input);
                     query = "SELECT * FROM rcc_fellows_locations WHERE first_last ILIKE '%" + input + "%' OR(institution ILIKE '%" + input + "%') OR(geographic_area ILIKE '%" + input + "%') OR(geographic_area2 ILIKE '%" + input + "%') OR(subj ILIKE '%" + input + "%') OR(subj2 ILIKE '%" + input + "%') OR(subj3 ILIKE '%" + input + "%')";
                     sql.getBounds(query).done(function(bounds) {
                         latlng = bounds[0]   //retrieve lat/long of the result of the sql
                         console.log(latlng);
-                        map.fitBounds(bounds);   //set map bounds to the result of the query; could add tooltip or infowindow pop-up upon zoom here
+                        map.fitBounds(bounds);   //set map bounds to the result of the query
                 });
             });
             //assign enter key to click function
-            $('#userInput').keypress(function(event){
+            $('.userInput').keypress(function(event){
                 if(event.keyCode == 13){
                     $('.search-button').click();   //allow enter key action to initiate the userInput value
                 }
             });
             //highlight text in search bar
-            $('#userInput').click(function(){
+            $('.userInput').click(function(){
                 $(this).select();   //highlight text when search bar is selected
             });
             //tooltip for search bar
             $(function(){
-                $('#userInput').tooltip({   //add tooltip to search box to prompt the search categories
+                $('.userInput').tooltip({   //add tooltip to search box to prompt the search categories
                     track:true,
                 });
             });
             //reset view button event
-            $('#reset-button').click(function() {   
-                map.setView([10, 0], 2);   //reset map view to original
-            }); 
-            //accordian widget for filters
-            $("#accordion").accordion({   //set accordion functions to collapsible when a mouse hover event
-                collapsible: true,
-                autowidth: true,
-                autoheight: true,
-                active: false,
-                event: "mouseover",
-            });
-            //checkbox function that allows allows one gender checkbox to be selected at a time and applies sql; can't figure out how to reset SQL in the else{} statement!
+            $('.reset-button').click(function() {   
+                map.setView([10, -5], 2);   //reset map view to original
+            });             
             
         }
         window.onload = main;
@@ -240,23 +210,22 @@
     <body>
         <div id="map"></div>
         <div id="search-container">
-            <input type='Text' id='userInput' title='Search by Name, Topic of Research, Institution, or Geographic Area of Interest.'>
-            <input type="button" id="reset-button" value="Reset View">
+            <input type='Text' class='userInput' title='Search by Name, Topic of Research, Institution, or Geographic Area of Interest.'>
+            <input type="button" class="reset-button" value="Reset View">
             <a href="#" class="search-button"><i class="fa fa-search"></i></a>
         </div>   
         <div id="panel" class='layer_selector'>
-            <h4>View Options</h4>
-              <ul>
-                <h4>By Gender:</h4>
-                <li class="layer" data=" WHERE male_female = 'female'" data-type="sql"><input type="checkbox" id='female' name="layer"><label>Female</label></li>
-                <li class="layer" data=" WHERE male_female = 'male'" data-type="sql"><input type="checkbox" id='male' name="layer"><label>Male</label></li>
-                <h4>RCC Bed n' Breakfast:</h4>
-                <li class="layer" data=" WHERE rcc_bnb ILIKE '%yes%'" data-type="sql"><input type="checkbox" id='bnb' name="layer"><label>Willing Hosts</label></li>
-                <li class="layer" data="" data-type="sql"><p><center><h1>Reset Filters</h1></center></p></li>
-              </ul>
+            <h4><center>Options</center></h4>
+            <h4><u>Sort By Gender</u></h4>
+                <input type="checkbox" id='female' name="layer"><label>Female</label>
+                <input type="checkbox" id='male' name="layer"><label>Male</label>
+            <h4><u>RCC Bed n' Breakfast</u></h4>
+                <input type="checkbox" id='bnb' name="layer"><label>Willing Hosts</label>
+                <p><center><input type="Button" class='reset_filters' value='Reset Filters'></center></p>
+            </div>
         </div>
         </div>
-        <div id="rcc_image">
+        <div class="rcc_image">
                 <img src="https://tnp-production.s3.amazonaws.com/uploads/image_logo/000/018/754/image/medium_62b1203c7f.png">
         </div>
     </body>
