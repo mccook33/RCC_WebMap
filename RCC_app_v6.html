@@ -183,14 +183,36 @@
                         map.fitBounds(bounds);   //set map bounds to the result of the query
                 });
             });
-            $('.male').change(function(){
+            $('#male').change(function() {
                 if($(this).is(':checked')){
-                    &('.female').attr('disabled', true);
-                },
-                else {
-                    
+                    $('#female').attr('disabled', true);
+                    $(this).attr('disabled', false);
+                    LayerActions[$(this).attr('id')]();
                 }
+                else {
+                    $('#female').attr('disabled', false);
+                }
+            });
+            $('#female').change(function() {
+                if($(this).is(':checked')) {
+                    $('#male').attr('disabled', true);
+                    $(this).attr('disabled', false);
+                    LayerActions[$(this).attr('id')]();
+                }
+                else {
+                    $('#male').attr('disabled', false);
+                }
+            });
+            //reset filter option button. So far, I can't get the layer to show when clicked. Maybe this button can just refresh the page to bring the original map back?
+            $('#reset_filter').click(function() {
+                $('#reset_filter').removeClass('selected');
+                $(this).addClass('selected');
+                sublayers[0].show();
+                //need to show the original layer when this is clicked...
+//                el.layer.show();
+//                LayerActions[$(this).attr('id')]();
             })
+        }
             //assign enter key to click function
             $('.userInput').keypress(function(event){
                 if(event.keyCode == 13){
@@ -210,7 +232,7 @@
             //reset view button event
             $('.reset-button').click(function() {   
                 map.setView([10, -5], 2);   //reset map view to original
-            });             
+            });            
             
         }
         window.onload = main;
