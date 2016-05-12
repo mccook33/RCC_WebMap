@@ -104,10 +104,10 @@
             #panel {
                 position: absolute;
                 bottom: 50;
-                left: 25;
+                left: 20;
                 background-color: transparent #DBD9D9;
                 opacity: 0.8;
-                padding: 5; margin: 5;
+                padding: 1; margin: 1;
                 width: auto;
                 height: auto;
                 -moz-border-radius: 5px;
@@ -117,18 +117,39 @@
                 background: rgba(255, 255, 255, 0.8);
                 font-family: 'Champ&Lim';
                 border-radius: 5px;
-                padding: 5;
+                padding: 1;
                 width: auto;
                 height: auto;
             }
-            .reset_filters {
+            #male {
+                background-color: #FFF;
+                font-family: 'Champ&Lim';
+                font-size: 14px;
+                border-radius: 5px;
+                padding: 2px; margin: 1px;
+            }
+            #female {
+                background-color: #FFF;
+                font-family: 'Champ&Lim';
+                font-size: 14px;
+                border-radius: 5px;
+                padding: 2px; margin: 1px;
+            }
+            #rcc_bnb {
+                background-color: #FFF;
+                font-family: 'Champ&Lim';
+                font-size: 14px;
+                border-radius: 5px;
+                padding: 2px; margin: 5px;
+            }
+            #reset_filters {
                 background-color: #FFF;
                 font-family: 'Champ&Lim';
                 font-size: 14px;
                 border-radius: 5px;
                 padding: 10px; margin: 20px;
             }
-            .reset_filters.active, .reset_filters:hover {
+            #reset_filters.active, #reset_filters:hover {
                 background-color: #ddd;
             }
             .ui-tooltip-content {
@@ -151,9 +172,7 @@
         function main() {
             //map url that points to vis Json link for CartoDB
             mapURL = 'https://mccook3.cartodb.com/api/v2/viz/3136e62c-98bf-11e5-8d04-0ef24382571b/viz.json'
-            
-            var tablename = "rcc_fellows_locations";
-    
+                
             var options = {   //map options
                 center: [10,-5],
                 zoom: 2,
@@ -188,38 +207,44 @@
             
             var LayerActions = {
                 
-                reset_filters: function(){
+                rcc_bnb: function() {
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows WHERE rcc_bnb_response = 'yes'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #084A8C; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-opacity: 1; marker-placement: point; marker-type: ellipse; marker-allow-overlap: true}"
+                    });
+                    return true;
+                },
+                
+                reset_filters: function() {
                     sublayers[0].set({
                         sql: "SELECT * FROM rcc_fellows_locations",
-                        cartocss: "#rcc_fellows_locations{marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-width: 7; marker-line-width: 1; marker-line-opacity: 1; marker-placement: point; marker-type: ellipse; marker-fill: #B40903; marker-allow-overlap: true;}"
+                        cartocss: "#rcc_fellows_locations{marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-width: 7; marker-line-width: 1; marker-line-opacity: 1; marker-placement: point; marker-type: ellipse; marker-fill: #B40903; marker-allow-overlap: true}"
                     });
                     return true;
                 },
                 
-                bnb: function(){
-                    sublayers[0].set({
-                        sql: "SELECT * FROM rcc_fellows WHERE rcc_bnb ILIKE '%yes%'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #084A8C; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
-                    });
-                    return true;
-                },
-                
-                male: function(){
+                male: function() {
                     sublayers[0].set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'male'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true}"
                     });
                     return true;
                 },
                 
-                female: function(){
+                female: function() {
                     sublayers[0].set({
                         sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'female'",
-                        cartocss: "#rcc_fellows_locations{marker-fill: #7947AB; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                        cartocss: "#rcc_fellows_locations{marker-fill: #7947AB; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true}"
                     });
                     return true;
-                }
-            };
+                },
+            }
+            
+            $('#rcc_bnb').click(function() {
+                $('#rcc_bnb').removeClass('selected');
+                $(this).addClass('selected');
+                LayerActions[$(this).attr('id')]();
+            });
             
             $('#male').click(function() {
                 $('#male').removeClass('selected');
@@ -229,12 +254,6 @@
             
             $('#female').click(function() {
                 $('#female').removeClass('selected');
-                $(this).addClass('selected');
-                LayerActions[$(this).attr('id')]();
-            });
-            
-            $('#bnb').click(function() {
-                $('#bnb').removeClass('selected');
                 $(this).addClass('selected');
                 LayerActions[$(this).attr('id')]();
             });
@@ -266,7 +285,7 @@
                 map.setView([10, -5], 2);   //reset map view to original
             });  
         }
-        window.onload = main;
+        window.onload = main
     </script>
     <body>
         <div id="map"></div>
@@ -277,9 +296,9 @@
         </div>   
         <div id="panel" class='layer_selector'>
             <h4><center>Options</center></h4>
-            <h4><u>Bed n' Breakfast</u></h4>
-            <center><input type="button" id='bnb' class='bnb' value='Willing Hosts'></center>
-            <h4><u>Sort By Gender</u></h4>
+            <h4><center><u>Bed n' Breakfast</u></center></h4>
+            <center><input type="button" id='rcc_bnb' class='rcc_bnb' value='Willing Hosts'></center>
+            <h4><center><u>Sort By Gender</u></center></h4>
             <center><input type="button" id='female' value='Female'><input type="button" id='male' value='Male'></center>
             <p><center><input type="button" id='reset_filters' class='reset_filters' value='Reset Filters'></center></p>
         </div>
