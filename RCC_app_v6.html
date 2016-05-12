@@ -160,17 +160,19 @@
                 scrollwheel: true 
             }
             
-            var sublayer;   //create an empty variable to be populated by the sublayer
+            var sublayers = [];   //create an empty variable to be populated by the sublayer
             
             cartodb.createVis('map', mapURL, options).on('done', function(vis, layer) {   //initiate cartodb map
+                
                 map = vis.getNativeMap();
-                var layer = layer[1]
-                sublayer = layer.getSubLayer(0);
-                layerSelector(sublayer);
                                 
+                sublayer = layer[1].getSubLayer(0);
+                
+                sublayers.push(sublayer);
             }).on('error', function(err) {
                 console.log(err);
             }); 
+            
             var sql = new cartodb.SQL({user: 'mccook3'});
             //search bar click event
             $('.search-button').click(function() {
@@ -183,36 +185,66 @@
                         map.fitBounds(bounds);   //set map bounds to the result of the query
                 });
             });
-            $('#male').change(function() {
-                if($(this).is(':checked')){
-                    $('#female').attr('disabled', true);
-                    $(this).attr('disabled', false);
-                    LayerActions[$(this).attr('id')]();
+            
+            var LayerActions = {
+                
+                reset_filters: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows_locations",
+                        cartocss: "#rcc_fellows_locations{marker-fill-opacity: 0.9; marker-line-color: #FFFFFF; marker-width: 7; marker-line-width: 1; marker-line-opacity: 1; marker-placement: point; marker-type: ellipse; marker-fill: #B40903; marker-allow-overlap: true;}"
+                    });
+                    return true;
+                },
+                
+                bnb: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows WHERE rcc_bnb ILIKE '%yes%'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #084A8C; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                    });
+                    return true;
+                },
+                
+                male: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'male'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #188929; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                    });
+                    return true;
+                },
+                
+                female: function(){
+                    sublayers[0].set({
+                        sql: "SELECT * FROM rcc_fellows_locations WHERE male_female = 'female'",
+                        cartocss: "#rcc_fellows_locations{marker-fill: #7947AB; marker-fill-opacity: 0.9; marker-width: 7; marker-line-color: #FFFFFF; marker-line-width: 1; marker-line-color: white; marker-line-opacity: 1; marker-line-width: 2; marker-type: ellipse; marker-allow-overlap: true;}"
+                    });
+                    return true;
                 }
-                else {
-                    $('#female').attr('disabled', false);
-                }
-            });
-            $('#female').change(function() {
-                if($(this).is(':checked')) {
-                    $('#male').attr('disabled', true);
-                    $(this).attr('disabled', false);
-                    LayerActions[$(this).attr('id')]();
-                }
-                else {
-                    $('#male').attr('disabled', false);
-                }
-            });
-            //reset filter option button. So far, I can't get the layer to show when clicked. Maybe this button can just refresh the page to bring the original map back?
-            $('#reset_filter').click(function() {
-                $('#reset_filter').removeClass('selected');
+            };
+            
+            $('#male').click(function() {
+                $('#male').removeClass('selected');
                 $(this).addClass('selected');
-                sublayers[0].show();
-                //need to show the original layer when this is clicked...
-//                el.layer.show();
-//                LayerActions[$(this).attr('id')]();
-            })
-        }
+                LayerActions[$(this).attr('id')]();
+            });
+            
+            $('#female').click(function() {
+                $('#female').removeClass('selected');
+                $(this).addClass('selected');
+                LayerActions[$(this).attr('id')]();
+            });
+            
+            $('#bnb').click(function() {
+                $('#bnb').removeClass('selected');
+                $(this).addClass('selected');
+                LayerActions[$(this).attr('id')]();
+            });
+            
+            $('#reset_filters').click(function() {
+                $('#reset_filters').removeClass('selected');
+                $(this).addClass('selected');
+                LayerActions[$(this).attr('id')]();
+            });
+            
             //assign enter key to click function
             $('.userInput').keypress(function(event){
                 if(event.keyCode == 13){
@@ -232,8 +264,7 @@
             //reset view button event
             $('.reset-button').click(function() {   
                 map.setView([10, -5], 2);   //reset map view to original
-            });            
-            
+            });  
         }
         window.onload = main;
     </script>
@@ -246,14 +277,11 @@
         </div>   
         <div id="panel" class='layer_selector'>
             <h4><center>Options</center></h4>
+            <h4><u>Bed n' Breakfast</u></h4>
+            <center><input type="button" id='bnb' class='bnb' value='Willing Hosts'></center>
             <h4><u>Sort By Gender</u></h4>
-                <input type="checkbox" id='female' name="layer"><label>Female</label>
-                <input type="checkbox" id='male' name="layer"><label>Male</label>
-            <h4><u>RCC Bed n' Breakfast</u></h4>
-                <input type="checkbox" id='bnb' name="layer"><label>Willing Hosts</label>
-                <p><center><input type="Button" class='reset_filters' value='Reset Filters'></center></p>
-            </div>
-        </div>
+            <center><input type="button" id='female' value='Female'><input type="button" id='male' value='Male'></center>
+            <p><center><input type="button" id='reset_filters' class='reset_filters' value='Reset Filters'></center></p>
         </div>
         <div class="rcc_image">
                 <img src="https://tnp-production.s3.amazonaws.com/uploads/image_logo/000/018/754/image/medium_62b1203c7f.png">
