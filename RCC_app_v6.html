@@ -183,6 +183,14 @@
                         map.fitBounds(bounds);   //set map bounds to the result of the query
                 });
             });
+            $('.male').change(function(){
+                if($(this).is(':checked')){
+                    &('.female').attr('disabled', true);
+                },
+                else {
+                    
+                }
+            })
             //assign enter key to click function
             $('.userInput').keypress(function(event){
                 if(event.keyCode == 13){
